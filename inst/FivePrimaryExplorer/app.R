@@ -11,6 +11,7 @@ library(shiny)
 library(xlsx)
 library(jsonlite)
 library(ggplot2)
+library(data.table)
 
 gvars <- reactiveValues()
 
@@ -19,12 +20,23 @@ read_fiveprimaryJSON <- function(path) {
 }
 
 extract_thresholds <- function(result) {
-  data.frame(preset = result$preset$presetName,
+  data.table(preset = result$preset$presetName,
              frequency = result$preset$modulation$frequencyRed,
              strategy = ifelse(result$preset$strategy$testContrast,
                                "contrast", "frequency"),
              finished = result$finished,
              threshold = result$value)
+}
+
+extract_presets <- function(result) {
+  data.table(result$preset[, c("presetName", "id", "description", "receptorType")],
+             result$preset$modulation,
+             result$preset$background,
+             result$preset$fixPoint,
+             result$preset$geometry,
+             result$preset$geometryModulation,
+             result$preset$strategy
+        )
 }
 
 # Define UI for application that draws a histogram
@@ -56,8 +68,6 @@ server <- function(input, output) {
     gvars$data <- read_fiveprimaryJSON(file$datapath)
     gvars$results <- extract_thresholds(gvars$data)
 
-    print(gvars$data$preset)
-
     ggplot(gvars$results, aes(x = frequency, y = 1 / threshold)) +
       geom_line() +
       scale_x_log10("Temporal frequency [Hz]") +
@@ -73,7 +83,7 @@ server <- function(input, output) {
       sheet1 <- createSheet(wb, "Thresholds")
       addDataFrame(gvars$results, sheet = sheet1)
       sheet2 <- createSheet(wb, "Stimulus")
-      addDataFrame(gvars$data$preset[, 1:5], sheet = sheet2)
+      addDataFrame(extract_presets(gvars$data), sheet = sheet2)
       saveWorkbook(wb, newFile)
     }
   )
