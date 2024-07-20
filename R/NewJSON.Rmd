@@ -1,0 +1,88 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r init}
+
+library(jsonlite)
+library(here)
+library(data.table)
+
+i_am("R/NewJSON.Rmd")
+
+
+```
+
+# Reading the data
+
+Using the option simplifyVector simplifies 
+
+```{r}
+
+mcvs <- read_json(here("inst", "213__AugeRechts_2024_07_05.json"), simplifyVector = TRUE)
+
+str(mcvs, max.level = 1)
+
+```
+
+# Examination data
+
+```{r}
+
+str(mcvs$examinationData, max.level = 1)
+
+```
+```{r}
+
+str(mcvs$examinationData$presets, max.level = 1)
+
+```
+
+# Measurement data
+
+```{r}
+
+str(mcvs$measurementData$data, max.level = 1)
+
+
+```
+```{r presets}
+
+str(mcvs$measurementData$data$preset, max.level = 1)
+
+```
+# Plotable data frame
+
+```{r}
+
+mcvs_plot <- data.table(
+  patid = as.integer(mcvs$examinationData$patientId),
+  condition = mcvs$measurementData$data$preset$presetName,
+  description = mcvs$measurementData$data$preset$description,
+  photoreceptor = mcvs$measurementData$data$preset$receptorType,
+  frequency = mcvs$measurementData$data$preset$modulation$frequencyRed,
+  threshold = mcvs$measurementData$data$value,
+  finished = mcvs$measurementData$data$finished
+)
+
+write.csv(mcvs_plot, file = here("inst", "213__AugeRechts_2024_07_05.csv"))
+
+mcvs <- read_json(here("inst", "75__AugeRechts_2024_07_04.json"), simplifyVector = TRUE)
+
+mcvs_plot <- data.table(
+  patid = as.integer(mcvs$examinationData$patientId),
+  condition = mcvs$measurementData$data$preset$presetName,
+  description = mcvs$measurementData$data$preset$description,
+  photoreceptor = mcvs$measurementData$data$preset$receptorType,
+  frequency = mcvs$measurementData$data$preset$modulation$frequencyRed,
+  threshold = mcvs$measurementData$data$value,
+  finished = mcvs$measurementData$data$finished
+)
+
+write.csv(mcvs_plot, file = here("inst", "75__AugeRechts_2024_07_04.csv"))
+
+
+
+```
+
