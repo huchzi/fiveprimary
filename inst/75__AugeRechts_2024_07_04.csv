@@ -1,0 +1,28 @@
+"","patid","condition","description","photoreceptor","frequency","threshold","finished"
+"1",75,"L-C 20 Hz","L-C maximal contrast 20.4%","L-Cones",20,0.0107421875,TRUE
+"2",75,"L-C 8 Hz","L-C maximal contrast 20.4%","L-Cones",8,0.0234375,TRUE
+"3",75,"MC-mel 10 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",10,0.0205078125,TRUE
+"4",75,"M-C 10 Hz","M-C maximal contrast 5.54%","M-Cones",10,0.1328125,TRUE
+"5",75,"MC-mel 8 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",8,0.0009765625,TRUE
+"6",75,"L-C 10 Hz","L-C maximal contrast 20.4%","L-Cones",10,0,TRUE
+"7",75,"MC-mel 1 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",1,0.0068359375,TRUE
+"8",75,"L-C 2 Hz","L-C maximal contrast 20.4%","L-Cones",2,0.0146484375,TRUE
+"9",75,"L-C 1 Hz","L-C maximal contrast 20.4%","L-Cones",1,0.033203125,TRUE
+"10",75,"L-C 6 Hz","L-C maximal contrast 20.4%","L-Cones",6,0.01171875,TRUE
+"11",75,"MC-mel 2 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",2,0.0625,TRUE
+"12",75,"L-C 14 Hz","L-C maximal contrast 20.4%","L-Cones",14,0.0166015625,TRUE
+"13",75,"L-C 24 Hz","L-C maximal contrast 20.4%","L-Cones",24,0.1015625,TRUE
+"14",75,"M-C 4 Hz","M-C maximal contrast 5.54%","M-Cones",4,0.109375,TRUE
+"15",75,"MC-mel 14 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",14,0.0380859375,TRUE
+"16",75,"M-C 8 Hz","M-C maximal contrast 5.54%","M-Cones",8,0.171875,TRUE
+"17",75,"M-C 20 Hz","M-C maximal contrast 5.54%","M-Cones",20,0.4453125,TRUE
+"18",75,"MC-mel 24 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",24,0.5,TRUE
+"19",75,"M-C 2 Hz","M-C maximal contrast 5.54%","M-Cones",2,0.12109375,TRUE
+"20",75,"MC-mel 4 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",4,0.0302734375,TRUE
+"21",75,"M-C 6 Hz","M-C maximal contrast 5.54%","M-Cones",6,0.0732421875,TRUE
+"22",75,"M-C 1 Hz","M-C maximal contrast 5.54%","M-Cones",1,0.140625,TRUE
+"23",75,"MC-mel 6 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",6,0.046875,TRUE
+"24",75,"L-C 4 Hz","L-C maximal contrast 20.4%","L-Cones",4,0.03125,TRUE
+"25",75,"MC-mel 20 Hz","M-C maximal contrast 23.93% Mel maximal contrast: -4.79%","Other",20,0.1279296875,TRUE
+"26",75,"M-C 24 Hz","M-C maximal contrast 5.54%","M-Cones",24,0.48828125,TRUE
+"27",75,"M-C 14 Hz","M-C maximal contrast 5.54%","M-Cones",14,0.251953125,TRUE

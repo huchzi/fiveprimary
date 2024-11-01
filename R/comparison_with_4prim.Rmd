@@ -1,0 +1,99 @@
+---
+title: "Comparing MCVS and 4primary"
+output: html_notebook
+---
+
+```{r}
+
+library(jsonlite)
+library(here)
+library(data.table)
+library(colorSpec)
+
+i_am("R/comparison_with_4prim.Rmd")
+
+mcvs <- read_json(here("inst", "213__AugeRechts_2024_07_05.json"), simplifyVector = TRUE)
+
+```
+
+# MCVS conditions
+
+```{r mcvs illuminance}
+
+mcvs_luminances <- mcvs$measurementData$data$preset$geometry$outerGeo$colour |>
+  unique() |>
+  unlist()
+
+pupil_diameter_mm <- 8
+pupil_area_mm2 <- pi * (pupil_diameter_mm / 2)^2
+
+mcvs_cd_per_meter2 <- sum(mcvs_luminances) 
+mcvs_troland <- mcvs_cd_per_meter2 * pupil_area_mm2
+
+```
+
+```{r mcvs chromaticity}
+
+mcvs_specs <- colorSpec::readSpectra(here("data", "mcvs_spectra.csv"))
+
+mcvs_specs$RED.LED <- 
+  mcvs_specs$RED.LED * mcvs_luminances$red / photometric(mcvs_specs)["RED.LED", "photopic1978"]
+mcvs_specs$GREEN.LED <- 
+  mcvs_specs$GREEN.LED * mcvs_luminances$green / photometric(mcvs_specs)["GREEN.LED", "photopic1978"]
+mcvs_specs$BLUE.LED <- 
+  mcvs_specs$BLUE.LED * mcvs_luminances$blue / photometric(mcvs_specs)["BLUE.LED", "photopic1978"]
+mcvs_specs$AMBER.LED <- 
+  mcvs_specs$AMBER.LED * mcvs_luminances$amber / photometric(mcvs_specs)["AMBER.LED", "photopic1978"]
+mcvs_specs$CYAN <- 
+  mcvs_specs$CYAN * mcvs_luminances$cyan / photometric(mcvs_specs)["CYAN", "photopic1978"]
+
+photometric(mcvs_specs)
+
+mcvs_xyz <- product(mcvs_specs, xyz1964.1nm, wavelength = "auto") |>
+  apply(2, sum)
+
+mcvs_x <- mcvs_xyz[1] / sum(mcvs_xyz)
+mcvs_y <- mcvs_xyz[2] / sum(mcvs_xyz)
+
+```
+# Four-primary conditions
+
+```{r led4 illuminance}
+
+pinhole_area_mm2 <- pi * 1.5^2
+
+led4_trolands <- list(red = 63, green = 15, blue = 27, cyan = 15)
+led4_trolands <- lapply(led4_trolands, function(x) return(x * 50 / 27))
+led4_luminances <- lapply(led4_trolands, function(x) return(x / pinhole_area_mm2))
+
+led4_cd_per_meter2 <- sum(unlist(led4_luminances))
+led4_troland <- led4_cd_per_meter2 * pupil_area_mm2
+
+```
+
+```{r led4 chromaticity}
+
+led4_specs <- colorSpec::readSpectra(here("data", "led4_spectra.csv"))
+
+led4_specs$red <- 
+  led4_specs$red * led4_luminances$red / photometric(led4_specs)["red", "photopic1978"]
+led4_specs$green <- 
+  led4_specs$green * led4_luminances$green / photometric(led4_specs)["green", "photopic1978"]
+led4_specs$blue <- 
+  led4_specs$blue * led4_luminances$blue / photometric(led4_specs)["blue", "photopic1978"]
+led4_specs$cyan <- 
+  led4_specs$cyan * led4_luminances$cyan / photometric(led4_specs)["cyan", "photopic1978"]
+
+photometric(led4_specs)
+
+led4_xyz <- product(led4_specs, xyz1964.1nm, wavelength = "auto") |>
+  apply(2, sum)
+
+led4_x <- led4_xyz[1] / sum(led4_xyz)
+led4_y <- led4_xyz[2] / sum(led4_xyz)
+
+```
+
+Following these calculations, the illuminances in the LED stimulator will be set to red: 116,67, green: 27.8 (using a 0.3 neutral density filter), blue: 50, and cyan: 27.8 (again, with a 0.3 ND filter).
+
+This results in a gamut for the L-cone stimulus of ~40% and for the L-cone stimulus of ~6%. The melanopsin contrast are negligible for L-cones, and ~8% of M-cone contrast for M-cone stimuli.

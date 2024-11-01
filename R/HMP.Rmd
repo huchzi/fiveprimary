@@ -1,0 +1,71 @@
+---
+title: "HMP with MCVS"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r init}
+
+library(here)
+library(jsonlite)
+library(ggplot2)
+library(data.table)
+
+i_am("R/HMP.Rmd")
+
+```
+
+```{r}
+
+hmp <- function(x, h, v, ymin) {
+
+  y <- log10(abs((10^h - 10^x)/(1+10^x)/(1+10^h))) + v
+  y[y < ymin] <- ymin
+
+  return(y)
+
+}
+
+```
+
+```{r}
+
+parsed_data <- read_json(here("inst", "HMP", "HMP RedGreen_2024_10_18.json"), simplifyVector = TRUE)
+
+parsed_data <- read_json(here("inst", "HMP", "Export_Jan K_2_999_AugeRechts_2024_10_29.json"), simplifyVector = TRUE)
+
+str(parsed_data)
+
+thresholds <- parsed_data$measurementData$data$value
+contrasts <- parsed_data$measurementData$data$preset$modulation
+
+hmp_table <- data.table(
+  x = log10(contrasts$contrastRed / contrasts$contrastGreen), 
+  y = log10(100 / (thresholds * (contrasts$contrastRed + contrasts$contrastGreen)))
+)
+
+```
+
+```{r}
+
+ymin <- min(hmp_table$y)
+
+try(hmp_fit <- nls(y ~ hmp(x, h, v, ymin),
+                   data = hmp_table,
+                   start = list(h = 0, v = 2)))
+
+hmp_curve <- data.table(x = seq(-1, 1, .005))
+hmp_curve[, y := predict(hmp_fit, newdata = hmp_curve)]
+
+ggplot(hmp_table, aes(x = x, y = y)) +
+  geom_point() +
+  geom_line(data = hmp_curve) +
+  theme_minimal() +
+  geom_label(x = coef(hmp_fit)[[1]], y = ymin - .2, label = round(coef(hmp_fit)[[1]], 3)) +
+  scale_x_continuous(expression(log[10] * " " * frac(C[red], C[green]))) +
+  scale_y_continuous(expression(log[10] * " " * Sensitivity), limits = c(-1, 2))
+
+ggsave(here("images", "HMP_02_OD_RedGreen.tiff"))
+
+```

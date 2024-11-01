@@ -1,0 +1,123 @@
+---
+title: "Create presets"
+output: html_notebook
+---
+
+```{r init, include=FALSE}
+
+library(jsonlite)
+library(here)
+
+i_am("R/create_presets.Rmd")
+
+```
+
+```{r load template}
+
+template <- fromJSON(here("data", "presets", "L+M-C 6 Hz.json"))
+
+str(template)
+
+```
+```{r set metadata}
+
+template$presetName <- "Campimetry S-cone"
+template$id <- "fff"
+template$description <- "Max. S-Cone contrast: 3.966; Location: X Y"
+template$receptorType <- "S-Cones"
+
+```
+
+```{r set background}
+
+template$background$red <- 27
+template$background$green <- 23
+template$background$amber <- 0
+template$background$blue <- 4
+template$background$cyan <- 22
+
+```
+
+```{r set fixPoint}
+
+template$fixPoint$point$x <- 600
+template$fixPoint$point$y <- 450
+template$fixPoint$radius <- 20
+template$fixPoint$lineWidth <- 3
+
+```
+
+```{r set stimulus geometry}
+
+template$geometry$innerGeo$center$x <- 89
+template$geometry$innerGeo$center$y <- 85
+
+# Goldmann IV
+template$geometry$innerGeo$radius <- 30
+template$geometry$outerGeo$radius <- 0
+
+```
+
+```{r set stimulus color}
+
+template$geometry$innerGeo$colour$red <- 27
+template$geometry$innerGeo$colour$green <- 23
+template$geometry$innerGeo$colour$amber <- 0
+template$geometry$innerGeo$colour$blue <- 4
+template$geometry$innerGeo$colour$cyan <- 22
+
+```
+
+```{r set modulation}
+
+freq <- 2
+template$modulation$frequencyRed <- freq
+template$modulation$frequencyGreen <- freq
+template$modulation$frequencyBlue <- freq
+template$modulation$frequencyCyan <- freq
+
+template$modulation$contrastRed <- 14.396536
+template$modulation$shiftRed <- 1
+template$modulation$contrastGreen <- 100
+template$modulation$shiftGreen <- 0
+template$modulation$contrastBlue <- 7.143961
+template$modulation$shiftBlue <- 0
+template$modulation$contrastCyan <- 65.842492
+template$modulation$shiftCyan <- 1
+
+```
+
+```{r}
+
+locations <- read.csv(here("data", "humphrey10d2.csv"))
+
+locations$phase <- sample(rep(1:4, each = 12))
+locations$n <- sample(1:48)
+locations$strategy <- sample(rep(c("Step Up", "Step Down"), each = 24))
+
+for (i in 1:nrow(locations)) {
+  template$presetName <- sprintf("Campimetry S Phase%d N%d %d %d",
+                                 locations[i, "phase"], 
+                                 locations[i, "n"],
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  template$id <- sprintf("ffff-%d-%d", 
+                                 locations[i, "xpx"], 
+                                 locations[i, "ypx"])
+  template$description <- sprintf("Max. S-Cone contrast: 3.966; Location: %d %d", 
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  
+  template$geometry$innerGeo$center$x <- locations[i, "xpx"]
+  template$geometry$innerGeo$center$y <- locations[i, "ypx"]
+  
+  template$strategy$strName <- locations[i, "strategy"]
+  
+  write_json(template, 
+             here("data", "presets", paste0(template$presetName, ".json")), 
+             auto_unbox = TRUE)
+}
+
+
+```
+
