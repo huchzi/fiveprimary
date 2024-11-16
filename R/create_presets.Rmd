@@ -10,6 +10,12 @@ library(here)
 
 i_am("R/create_presets.Rmd")
 
+locations <- read.csv(here("data", "humphrey10d2.csv"))
+
+locations$phase <- sample(rep(1:4, each = 12))
+locations$n <- sample(1:48)
+locations$strategy <- sample(rep(c("Step Up", "Step Down"), each = 24))
+
 ```
 
 ```{r load template}
@@ -68,6 +74,8 @@ template$geometry$innerGeo$colour$cyan <- 22
 
 ```
 
+# S-cone
+
 ```{r set modulation}
 
 freq <- 2
@@ -88,12 +96,6 @@ template$modulation$shiftCyan <- 1
 ```
 
 ```{r}
-
-locations <- read.csv(here("data", "humphrey10d2.csv"))
-
-locations$phase <- sample(rep(1:4, each = 12))
-locations$n <- sample(1:48)
-locations$strategy <- sample(rep(c("Step Up", "Step Down"), each = 24))
 
 for (i in 1:nrow(locations)) {
   template$presetName <- sprintf("Campimetry S Phase%d N%d %d %d",
@@ -121,3 +123,149 @@ for (i in 1:nrow(locations)) {
 
 ```
 
+# Rod
+
+```{r set modulation}
+
+freq <- 12
+template$modulation$frequencyRed <- freq
+template$modulation$frequencyGreen <- freq
+template$modulation$frequencyBlue <- freq
+template$modulation$frequencyCyan <- freq
+
+template$modulation$contrastRed <- 8.633854
+template$modulation$shiftRed <- 0
+template$modulation$contrastGreen <- 100
+template$modulation$shiftGreen <- 1
+template$modulation$contrastBlue <- 26.643638
+template$modulation$shiftBlue <- 0
+template$modulation$contrastCyan <- 1.211611
+template$modulation$shiftCyan <- 1
+
+```
+
+```{r}
+
+for (i in 1:nrow(locations)) {
+  template$presetName <- sprintf("Campimetry Rod Phase%d N%d %d %d",
+                                 locations[i, "phase"], 
+                                 locations[i, "n"],
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  template$id <- sprintf("ffff-%d-%d", 
+                                 locations[i, "xpx"], 
+                                 locations[i, "ypx"])
+  template$description <- sprintf("Max. Rod contrast: 1.1742; Location: %d %d", 
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  
+  template$geometry$innerGeo$center$x <- locations[i, "xpx"]
+  template$geometry$innerGeo$center$y <- locations[i, "ypx"]
+  
+  template$strategy$strName <- locations[i, "strategy"]
+  
+  write_json(template, 
+             here("data", "presets", paste0(template$presetName, ".json")), 
+             auto_unbox = TRUE)
+}
+
+
+```
+
+# L-cone Luminance
+
+```{r set modulation}
+
+freq <- 20
+template$modulation$frequencyRed <- freq
+template$modulation$frequencyGreen <- freq
+template$modulation$frequencyBlue <- freq
+template$modulation$frequencyCyan <- freq
+
+template$modulation$contrastRed <- 97.2598068
+template$modulation$shiftRed <- 0
+template$modulation$contrastGreen <- 100
+template$modulation$shiftGreen <- 1
+template$modulation$contrastBlue <- 7.7765011
+template$modulation$shiftBlue <- 0
+template$modulation$contrastCyan <- 0.3540506
+template$modulation$shiftCyan <- 1
+
+```
+
+```{r}
+
+for (i in 1:nrow(locations)) {
+  template$presetName <- sprintf("Campimetry L_lum Phase%d N%d %d %d",
+                                 locations[i, "phase"], 
+                                 locations[i, "n"],
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  template$id <- sprintf("ffff-%d-%d", 
+                                 locations[i, "xpx"], 
+                                 locations[i, "ypx"])
+  template$description <- sprintf("Max. L contrast: 11.7510; Location: %d %d", 
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  
+  template$geometry$innerGeo$center$x <- locations[i, "xpx"]
+  template$geometry$innerGeo$center$y <- locations[i, "ypx"]
+  
+  template$strategy$strName <- locations[i, "strategy"]
+  
+  write_json(template, 
+             here("data", "presets", paste0(template$presetName, ".json")), 
+             auto_unbox = TRUE)
+}
+
+
+```
+
+# L-cone Color
+
+```{r set modulation}
+
+freq <- 2
+template$modulation$frequencyRed <- freq
+template$modulation$frequencyGreen <- freq
+template$modulation$frequencyBlue <- freq
+template$modulation$frequencyCyan <- freq
+
+template$modulation$contrastRed <- 97.2598068
+template$modulation$shiftRed <- 0
+template$modulation$contrastGreen <- 100
+template$modulation$shiftGreen <- 1
+template$modulation$contrastBlue <- 7.7765011
+template$modulation$shiftBlue <- 0
+template$modulation$contrastCyan <- 0.3540506
+template$modulation$shiftCyan <- 1
+
+```
+
+```{r}
+
+for (i in 1:nrow(locations)) {
+  template$presetName <- sprintf("Campimetry L_col Phase%d N%d %d %d",
+                                 locations[i, "phase"], 
+                                 locations[i, "n"],
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  template$id <- sprintf("ffff-%d-%d", 
+                                 locations[i, "xpx"], 
+                                 locations[i, "ypx"])
+  template$description <- sprintf("Max. L contrast: 11.7510; Location: %d %d", 
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  
+  template$geometry$innerGeo$center$x <- locations[i, "xpx"]
+  template$geometry$innerGeo$center$y <- locations[i, "ypx"]
+  
+  template$strategy$strName <- locations[i, "strategy"]
+  
+  write_json(template, 
+             here("data", "presets", paste0(template$presetName, ".json")), 
+             auto_unbox = TRUE)
+}
+
+
+```
