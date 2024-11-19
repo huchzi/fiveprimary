@@ -76,7 +76,9 @@ template$geometry$innerGeo$colour$cyan <- 22
 
 # S-cone
 
-```{r set modulation}
+```{r set modulation S}
+
+template$receptorType <- "S-Cones"
 
 freq <- 2
 template$modulation$frequencyRed <- freq
@@ -125,7 +127,9 @@ for (i in 1:nrow(locations)) {
 
 # Rod
 
-```{r set modulation}
+```{r set modulation R}
+
+template$receptorType <- "Rods"
 
 freq <- 12
 template$modulation$frequencyRed <- freq
@@ -174,7 +178,9 @@ for (i in 1:nrow(locations)) {
 
 # L-cone Luminance
 
-```{r set modulation}
+```{r set modulation Llum}
+
+template$receptorType <- "L-Cones"
 
 freq <- 20
 template$modulation$frequencyRed <- freq
@@ -223,7 +229,7 @@ for (i in 1:nrow(locations)) {
 
 # L-cone Color
 
-```{r set modulation}
+```{r set modulation Lcol}
 
 freq <- 2
 template$modulation$frequencyRed <- freq
