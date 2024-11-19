@@ -1,0 +1,125 @@
+---
+title: "Test stimulus calculation"
+output: html_notebook
+---
+
+```{r init, include=FALSE}
+
+library(here)
+i_am("R/test_calculations.Rmd")
+source(here("R", "functions.R"))
+
+```
+
+# Own example
+
+```{r}
+
+l_mean <- c(20, 40, 3, 20)
+P_LED <- calculate_power_spectra(l_mean, as.matrix(analyzeTCS::LED1[, -1]))
+s_receptors <- as.matrix(ConeFundamentals10)
+
+A_matrix <- 
+  create_A_matrix(P_LED, s_receptors)
+
+a <- find_LED_contrasts(c(rod = .1, scone = 0, mcone = 0, lcone = 0), A_matrix)
+b <- findLEDContrasts(c(lcone = 0, mcone = 0, rod = 10, scone = 0), 
+                      c(red = 20, green = 40, blue = 3, cyan = 20), 
+                      ConeFundamentals10, FALSE)
+
+
+
+```
+
+# Find out what last step in old script does
+
+```{r}
+
+lmean <- c(20, 40, 3, 20)
+A_matrix <- crossprod(as.matrix(LED1[, 2:5]), as.matrix(ConeFundamentals10))
+rinput <- c()
+for(i in 1:4) {
+  rinput <- rbind(rinput, 2 * lum2nrg[i] * lmean[i] * A_matrix[i, ] / 100)
+}
+rinput2 <- t(t(rinput) / apply(rinput, 2, sum))
+
+```
+
+```{r}
+
+P_LED <- as.matrix(analyzeTCS::LED1[, -1])
+s_receptors <- as.matrix(ConeFundamentals10)
+
+A_matrix <- 
+  create_A_matrix(P_LED, s_receptors)
+
+print(t(A_matrix)[c(2, 3, 4, 1), c(3, 4, 2, 1)])
+
+```
+
+```{r}
+
+# scaling for max power range
+
+a <- find_LED_contrasts(c(rod = 0, scone = 0, mcone = 1, lcone = 0), A_matrix)
+
+max(abs(a))
+
+crossprod(c(1, 1, 1, 1), matrix(1:16, nrow = 4))
+
+crossprod(A_matrix, diag(4))
+A_matrix
+
+```
+
+# Testing our formulas with the data from the Star Protocol
+
+## Deriving the A-Matrix
+
+## Using the A-Matrix
+
+```{r load A-matrix from STAR, include = FALSE}
+
+star_A_matrix <- 
+  as.matrix(
+    read.csv2(here("data", "star_A_matrix.csv"), row.names = 1)
+  )
+
+```
+
+The excel sheet contains an unnecessary matrix mulplication with a diagonal vector. The product with the vectors (1, 0, 0, 0, 0), (0, 1, 0, 0, 0), basically picks single columns of the inverted A-matrix and allows identification of the largest absolute value.
+
+```{r recapitulating calculations from excel}
+
+print(star_A_matrix)
+
+identical(solve(star_A_matrix), solve(star_A_matrix) %*% diag(5))
+
+# Scaling for power range
+A2 <- apply(solve(star_A_matrix), 
+                         2, 
+                         FUN = function(x) max(abs(x)))
+
+max(abs(solve(star_A_matrix) %*% c(1, 0, 0, 0, 0))) == A2[1]
+
+```
+
+
+```{r}
+
+max_power_range <- apply(solve(star_A_matrix), 
+                         2, 
+                         FUN = function(x) max(abs(x)))
+
+# Rescale the inverted A-matrix
+rescaled_inverted_A_matrix <- (matrix(c(1,1,1,1,1), ncol = 1) %*% (1/max_power_range)) * solve(star_A_matrix)
+
+find_LED_contrasts(c(rod = .1, lcone = 0, scone = 0, mcone = 0, i = 0), star_A_matrix)
+
+# rescale the star matrix, so that the sum becomes 1
+rescaled_to_sum <- t(t(star_A_matrix) / apply(star_A_matrix, 2, sum))
+
+
+```
+
+The star protocoll rescales the A-matrix to a maximum value of 1, wheres the old protocol rescales to a sum of 1.

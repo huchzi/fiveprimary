@@ -1,0 +1,39 @@
+---
+title: "Silent Substitution Calculations"
+output: html_notebook
+---
+
+# Prerequisites
+
+-   General
+    -   cone fundamentals
+    -   $V_{\lambda}$
+-   Specific for apparatus
+    -   LED spectra (normalized to 1?)
+    -   luminances
+
+## Units
+
+# Preliminary calculations
+
+## Calculate LED spectra in photometric units
+
+```{r}
+
+LED_power <- as.matrix(analyzeTCS::LED1[, 2:5])
+
+spectral_sensitivities <- as.matrix(analyzeTCS::ConeFundamentals10)
+
+```
+
+## Calculate A-Matrix
+
+$a_{i,j} = \int{P_j(\lambda)s_i(\lambda)}d\lambda$
+
+```{r}
+
+a_matrix <- crossprod(LED_power, spectral_sensitivities)
+
+print(a_matrix)
+
+```

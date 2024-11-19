@@ -1,0 +1,218 @@
+---
+title: "Compare fundamentals"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r, include = FALSE}
+
+library(here)
+library(colorSpec)
+library(data.table)
+library(ggplot2)
+library(magrittr)
+library(openxlsx)
+
+i_am("R/calculationNeil.Rmd")
+
+source(here("R", "functions.R"))
+
+```
+
+## Load data
+
+```{r load}
+
+# For calculation, I use wavelengths between 390 and 780nm in steps of 2nm
+wavelengths <- seq(390, 780, 2)
+
+# Read data from Manchester
+manchester <- data.table(read.xlsx(here("other_data", "all manchester spectra.xlsx")))
+names(manchester)[1] <- "Wavelength"
+fundamentals_manchester <- manchester[Wavelength >= 390, .(Wavelength, R, S, M, L)]
+names(fundamentals_manchester) <- c("Wavelength", "rod", "scone", "mcone", "lcone")
+
+led_spectra <- manchester[Wavelength >= 390, .(Wavelength, Red, Green, Blue, Amber)]
+
+# Read fundamentals from Erlangen
+load(here("data", "photoreceptor_sensitivities.rda"))
+fundamentals_cord <- data.table(Wavelength = wavelengths, 
+                                photoreceptor_spectral_sensitivities)
+fundamentals_cord$melanopsin <- NULL
+
+```
+
+## Compare fundamentals graphically
+
+The red lines are the fundamentals from Erlangen, the black lines from Manchester.
+
+```{r}
+
+ggplot(melt(fundamentals_manchester, id.vars = "Wavelength"), 
+       aes(x = Wavelength, y = value, group = variable)) +
+  geom_line() +
+  geom_line(data = melt(fundamentals_cord, id.vars = "Wavelength"), color = "red")
+
+```
+
+## Comparison with the Stockman fundamentals
+
+There is also a Stockman & Sharpe (2000) table ("2-deg fundamentals based on the Stiles & Burch 10-deg CMFs (adjusted to 2-deg)") on cvrl.org. The cone fundamentals from Jan's Excel sheet are apparently identical to the ones from Manchester and similar but not identical to these Stockman&Sharpe 2° fundamentals (green). The differ at lower wavelengths.
+
+```{r}
+
+data.table(Wavelength = wavelengths, analyzeTCS::ConeFundamentals2) %>%
+  melt(id.vars = "Wavelength") %>%
+  ggplot(aes(x = Wavelength, y = value, group = variable)) +
+  geom_line(color = "green") +
+  geom_line(data = melt(fundamentals_manchester, id.vars = "Wavelength"))
+
+```
+
+## LED spectra from Manchester
+
+```{r}
+
+ggplot(melt(led_spectra, id.vars = "Wavelength"), 
+       aes(x = Wavelength, y = value, group = variable)) +
+  geom_line() 
+
+```
+
+I'm not sure what luminances to use for calculating the spectra. However, this should not matter, so I will just pick 10cd/m^2 for each LED.
+
+```{r}
+
+led_luminances <- c(Red = 10, Amber = 10, Green = 10, Blue = 10)
+
+p_led <- 
+  led_spectra %>%
+  get_normalized_spectrum_matrix() %>%
+  calculate_power_spectra(luminances = led_luminances, spectra = .)
+
+
+
+```
+
+This results in the following LED powers [W/m^2].
+
+```{r}
+
+apply(p_led, 2, sum)
+
+```
+
+## Calculate A-Matrices
+
+### Fundamentals from Erlangen
+
+```{r}
+
+print(create_A_matrix)
+
+```
+The main part of this function is:
+*a_matrix <- crossprod(P_led, s_receptors)*
+
+```{r}
+
+s_receptors <- 
+  fundamentals_cord %>%
+  get_normalized_spectrum_matrix() 
+
+p_led <- 
+  led_spectra %>%
+  get_normalized_spectrum_matrix() %>%
+  calculate_power_spectra(luminances = led_luminances, spectra = .)
+
+a_matrix_cord <- create_A_matrix(P_led = p_led, s_receptors = s_receptors)
+
+print(a_matrix_cord)
+
+
+
+```
+In Jan's spreadsheet, the A-Matrix is normalized, so that all colums add up to one. As a consequence, calculations with photoreceptor contrasts should be possible.
+
+```{r}
+
+# Calculate column sums
+apply(a_matrix_cord, 2, sum)
+
+```
+
+### Fundamentals from Manchester
+
+```{r}
+
+s_receptors <- 
+  fundamentals_manchester %>%
+  get_normalized_spectrum_matrix() 
+
+p_led <- 
+  led_spectra %>%
+  get_normalized_spectrum_matrix() %>%
+  calculate_power_spectra(luminances = led_luminances, spectra = .)
+
+a_matrix_manchester <- create_A_matrix(P_led = p_led, s_receptors = s_receptors)
+
+print(a_matrix_manchester)
+
+```
+
+## Compare resulting LED contrasts
+
+LED contrasts are calculated by calculating the crossproduct of the photoreceptor contrasts and the inverse of the A-Matrix.
+
+```{r}
+
+print(find_LED_contrasts)
+
+```
+
+The main part of this function is:
+*contrast_matrix <- crossprod(photoreceptor_contrasts, solve(A_matrix))*
+
+### L-cone contrast of 10%
+
+Comparison of the Michelson contrast in %. A negative signs means modulation in counterphase.
+
+```{r}
+
+find_LED_contrasts(c(lcone = .1, mcone = 0, rod = 0, scone = 0), a_matrix_cord) * 100
+
+find_LED_contrasts(c(lcone = .1, mcone = 0, rod = 0, scone = 0), a_matrix_manchester) * 100
+
+```
+### M-cone contrast of 10%
+
+Apparently, there is a considerable difference between calculations. Note that amber modulation is > 100% here, so that 10% M-cone contrast is above instrument gamut, but this should not matter here.
+
+```{r}
+
+find_LED_contrasts(c(lcone = 0, mcone = 0.1, rod = 0, scone = 0), a_matrix_cord) * 100
+
+find_LED_contrasts(c(lcone = 0, mcone = 0.1, rod = 0, scone = 0), a_matrix_manchester) * 100
+
+```
+### Rod contrast of 10%
+
+```{r}
+
+find_LED_contrasts(c(lcone = 0, mcone = 0, rod = 0.1, scone = 0), a_matrix_cord) * 100
+
+find_LED_contrasts(c(lcone = 0, mcone = 0, rod = 0.1, scone = 0), a_matrix_manchester) * 100
+
+```
+
+### S-cone contrast of 10%
+
+```{r}
+
+find_LED_contrasts(c(lcone = 0, mcone = 0, rod = 0, scone = 0.1), a_matrix_cord) * 100
+
+find_LED_contrasts(c(lcone = 0, mcone = 0, rod = 0, scone = 0.1), a_matrix_manchester) * 100
+
+```

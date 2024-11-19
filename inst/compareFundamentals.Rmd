@@ -1,0 +1,116 @@
+---
+title: "Compare fundamentals"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r, include = FALSE}
+
+library(here)
+library(colorSpec)
+library(data.table)
+library(ggplot2)
+library(magrittr)
+
+i_am("R/compareFundamentals.Rmd")
+
+source(here("R", "functions.R"))
+wavelengths <- seq(390, 780, 2)
+load(here("data", "photoreceptor_sensitivities.rda"))
+fundamentals_cord <- data.table(Wavelength = wavelengths, photoreceptor_spectral_sensitivities)
+fundamentals_jan <- data.table(resample(readSpectra(here("data", "fundamentals_jan.csv")), wavelengths))
+led_spectra <- data.table(readSpectra(here("other_data", "Stockman_5 primary.csv")))
+
+
+```
+
+## Compare fundamentals graphically
+
+The red lines are the fundamentals from the app, the black lines from Jan's Excel sheet. The cone fundamentals from the app are identical to the Stockman 10° fundamentals.
+
+There is a considerable differences in the cone fundamentals but especially in the melanopsin spectrum.
+
+```{r}
+
+ggplot(melt(fundamentals_jan, id.vars = "Wavelength"), aes(x = Wavelength, y = value, group = variable)) +
+  geom_line() +
+  geom_line(data = melt(fundamentals_cord, id.vars = "Wavelength"), color = "red")
+
+```
+# Comparison with the Stockman fundamentals
+
+The cone fundamentals from the Excel sheet are similar but not identical to the Stockman 2° fundamentals (green). The differ at lower wavelengths.
+
+```{r}
+
+data.table(Wavelength = wavelengths, analyzeTCS::ConeFundamentals2) %>%
+  melt(id.vars = "Wavelength") %>%
+  ggplot(aes(x = Wavelength, y = value, group = variable)) +
+  geom_line(color = "green") +
+  geom_line(data = melt(fundamentals_jan, id.vars = "Wavelength"))
+
+```
+
+## Calculate A-Matrices
+
+### Fundamentals from the app
+
+```{r}
+
+s_receptors <- 
+  fundamentals_cord %>%
+  get_normalized_spectrum_matrix() 
+
+p_led <- 
+  led_spectra %>%
+  get_normalized_spectrum_matrix() %>%
+  calculate_power_spectra(c(20, 6, 10, 10, 1), .)
+
+a_matrix_cord <- create_A_matrix(P_led = p_led, s_receptors = s_receptors)
+
+print(a_matrix_cord)
+
+```
+
+### Fundamentals from Jan's Excel sheet
+
+```{r}
+
+s_receptors <- 
+  fundamentals_jan %>%
+  get_normalized_spectrum_matrix() 
+colnames(s_receptors) <- colnames(a_matrix_cord)
+
+p_led <- 
+  led_spectra %>%
+  get_normalized_spectrum_matrix() %>%
+  calculate_power_spectra(c(20, 6, 10, 10, 1), .)
+
+a_matrix_jan <- create_A_matrix(P_led = p_led, s_receptors = s_receptors)
+
+print(a_matrix_jan)
+
+```
+
+## Compare resulting LED contrasts
+
+Comparison for a 10% l-cone contrast.
+
+### Fundamentals from the app
+
+```{r}
+
+find_LED_contrasts(c(lcone = .1, mcone = 0, rod = 0, melanopsin = 0, scone = 0), a_matrix_cord)
+
+```
+
+### Fundamentals from Jan's Excel sheet
+
+```{r}
+
+find_LED_contrasts(c(lcone = .1, mcone = 0, rod = 0, melanopsin = 0, scone = 0), a_matrix_jan)
+
+```
