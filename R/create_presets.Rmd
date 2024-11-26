@@ -117,9 +117,9 @@ for (i in 1:nrow(locations)) {
   
   template$strategy$strName <- locations[i, "strategy"]
   
-  write_json(template,
-             here("data", "presets", paste0(template$presetName, ".json")),
-             auto_unbox = TRUE)
+  # write_json(template,
+  #            here("data", "presets", paste0(template$presetName, ".json")),
+  #            auto_unbox = TRUE)
 }
 
 
@@ -168,9 +168,9 @@ for (i in 1:nrow(locations)) {
   
   template$strategy$strName <- locations[i, "strategy"]
   
-  write_json(template, 
-             here("data", "presets", paste0(template$presetName, ".json")), 
-             auto_unbox = TRUE)
+  # write_json(template, 
+  #            here("data", "presets", paste0(template$presetName, ".json")), 
+  #            auto_unbox = TRUE)
 }
 
 
@@ -219,9 +219,9 @@ for (i in 1:nrow(locations)) {
   
   template$strategy$strName <- locations[i, "strategy"]
   
-  write_json(template,
-             here("data", "presets", paste0(template$presetName, ".json")),
-             auto_unbox = TRUE)
+  # write_json(template,
+  #            here("data", "presets", paste0(template$presetName, ".json")),
+  #            auto_unbox = TRUE)
 }
 
 
@@ -251,6 +251,97 @@ for (i in 1:nrow(locations)) {
                                  locations[i, "xpx"], 
                                  locations[i, "ypx"])
   template$description <- sprintf("Max. L contrast: 25.1; Location: %d %d", 
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  
+  template$geometry$innerGeo$center$x <- locations[i, "xpx"]
+  template$geometry$innerGeo$center$y <- locations[i, "ypx"]
+  
+  template$strategy$strName <- locations[i, "strategy"]
+  
+  # write_json(template,
+  #            here("data", "presets", paste0(template$presetName, ".json")),
+  #            auto_unbox = TRUE)
+}
+
+
+```
+
+# M-cone Luminance
+
+```{r set modulation Mlum}
+
+template$receptorType <- "M-Cones"
+
+freq <- 20
+template$modulation$frequencyRed <- freq
+template$modulation$frequencyGreen <- freq
+template$modulation$frequencyBlue <- freq
+template$modulation$frequencyCyan <- freq
+
+template$modulation$contrastRed <-66.14874
+template$modulation$shiftRed <- 1
+template$modulation$contrastGreen <- 100
+template$modulation$shiftGreen <- 0
+template$modulation$contrastBlue <- 22.11235
+template$modulation$shiftBlue <- 0
+template$modulation$contrastCyan <- 18.51323
+template$modulation$shiftCyan <- 1
+
+```
+
+```{r}
+
+for (i in 1:nrow(locations)) {
+  template$presetName <- sprintf("Campimetry M_lum Phase%d N%d %d %d",
+                                 locations[i, "phase"], 
+                                 locations[i, "n"],
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  template$id <- sprintf("ffff-%d-%d", 
+                                 locations[i, "xpx"], 
+                                 locations[i, "ypx"])
+  template$description <- sprintf("Max. M contrast: 14.7; Location: %d %d", 
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  
+  template$geometry$innerGeo$center$x <- locations[i, "xpx"]
+  template$geometry$innerGeo$center$y <- locations[i, "ypx"]
+  
+  template$strategy$strName <- locations[i, "strategy"]
+  
+  write_json(template,
+             here("data", "presets", paste0(template$presetName, ".json")),
+             auto_unbox = TRUE)
+}
+
+
+```
+
+# M-cone Color
+
+```{r set modulation Mcol}
+
+freq <- 2
+template$modulation$frequencyRed <- freq
+template$modulation$frequencyGreen <- freq
+template$modulation$frequencyBlue <- freq
+template$modulation$frequencyCyan <- freq
+
+```
+
+```{r}
+
+for (i in 1:nrow(locations)) {
+  template$presetName <- sprintf("Campimetry M_col Phase%d N%d %d %d",
+                                 locations[i, "phase"], 
+                                 locations[i, "n"],
+                                 locations[i, "xdeg"], 
+                                 locations[i, "ydeg"])
+  template$id <- sprintf("ffff-%d-%d", 
+                                 locations[i, "xpx"], 
+                                 locations[i, "ypx"])
+  template$description <- sprintf("Max. M contrast: 14.7; Location: %d %d", 
                                  locations[i, "xdeg"], 
                                  locations[i, "ydeg"])
   
