@@ -86,13 +86,13 @@ template$modulation$frequencyGreen <- freq
 template$modulation$frequencyBlue <- freq
 template$modulation$frequencyCyan <- freq
 
-template$modulation$contrastRed <- 14.396536
+template$modulation$contrastRed <- 14.29374
 template$modulation$shiftRed <- 1
-template$modulation$contrastGreen <- 100
+template$modulation$contrastGreen <- 23.76894
 template$modulation$shiftGreen <- 0
-template$modulation$contrastBlue <- 7.143961
+template$modulation$contrastBlue <- 100.00000 
 template$modulation$shiftBlue <- 0
-template$modulation$contrastCyan <- 65.842492
+template$modulation$contrastCyan <- 34.98733
 template$modulation$shiftCyan <- 1
 
 ```
@@ -108,7 +108,7 @@ for (i in 1:nrow(locations)) {
   template$id <- sprintf("ffff-%d-%d", 
                                  locations[i, "xpx"], 
                                  locations[i, "ypx"])
-  template$description <- sprintf("Max. S-Cone contrast: 3.966; Location: %d %d", 
+  template$description <- sprintf("Max. S-Cone contrast: 26.4; Location: %d %d", 
                                  locations[i, "xdeg"], 
                                  locations[i, "ydeg"])
   
@@ -117,8 +117,8 @@ for (i in 1:nrow(locations)) {
   
   template$strategy$strName <- locations[i, "strategy"]
   
-  write_json(template, 
-             here("data", "presets", paste0(template$presetName, ".json")), 
+  write_json(template,
+             here("data", "presets", paste0(template$presetName, ".json")),
              auto_unbox = TRUE)
 }
 
@@ -137,14 +137,14 @@ template$modulation$frequencyGreen <- freq
 template$modulation$frequencyBlue <- freq
 template$modulation$frequencyCyan <- freq
 
-template$modulation$contrastRed <- 8.633854
+template$modulation$contrastRed <- 36.06473
 template$modulation$shiftRed <- 0
-template$modulation$contrastGreen <- 100
+template$modulation$contrastGreen <- 100.00000
 template$modulation$shiftGreen <- 1
-template$modulation$contrastBlue <- 26.643638
-template$modulation$shiftBlue <- 0
-template$modulation$contrastCyan <- 1.211611
-template$modulation$shiftCyan <- 1
+template$modulation$contrastBlue <- 71.35332 
+template$modulation$shiftBlue <- 1
+template$modulation$contrastCyan <- 59.56461
+template$modulation$shiftCyan <- 0
 
 ```
 
@@ -159,7 +159,7 @@ for (i in 1:nrow(locations)) {
   template$id <- sprintf("ffff-%d-%d", 
                                  locations[i, "xpx"], 
                                  locations[i, "ypx"])
-  template$description <- sprintf("Max. Rod contrast: 1.1742; Location: %d %d", 
+  template$description <- sprintf("Max. Rod contrast: 17.4; Location: %d %d", 
                                  locations[i, "xdeg"], 
                                  locations[i, "ydeg"])
   
@@ -188,14 +188,14 @@ template$modulation$frequencyGreen <- freq
 template$modulation$frequencyBlue <- freq
 template$modulation$frequencyCyan <- freq
 
-template$modulation$contrastRed <- 97.2598068
+template$modulation$contrastRed <-100.0000000
 template$modulation$shiftRed <- 0
-template$modulation$contrastGreen <- 100
+template$modulation$contrastGreen <- 24.6143667
 template$modulation$shiftGreen <- 1
-template$modulation$contrastBlue <- 7.7765011
-template$modulation$shiftBlue <- 0
-template$modulation$contrastCyan <- 0.3540506
-template$modulation$shiftCyan <- 1
+template$modulation$contrastBlue <- 5.132218
+template$modulation$shiftBlue <- 1
+template$modulation$contrastCyan <- 4.279250
+template$modulation$shiftCyan <- 0
 
 ```
 
@@ -210,7 +210,7 @@ for (i in 1:nrow(locations)) {
   template$id <- sprintf("ffff-%d-%d", 
                                  locations[i, "xpx"], 
                                  locations[i, "ypx"])
-  template$description <- sprintf("Max. L contrast: 11.7510; Location: %d %d", 
+  template$description <- sprintf("Max. L contrast: 25.1; Location: %d %d", 
                                  locations[i, "xdeg"], 
                                  locations[i, "ydeg"])
   
@@ -219,8 +219,8 @@ for (i in 1:nrow(locations)) {
   
   template$strategy$strName <- locations[i, "strategy"]
   
-  write_json(template, 
-             here("data", "presets", paste0(template$presetName, ".json")), 
+  write_json(template,
+             here("data", "presets", paste0(template$presetName, ".json")),
              auto_unbox = TRUE)
 }
 
@@ -237,15 +237,6 @@ template$modulation$frequencyGreen <- freq
 template$modulation$frequencyBlue <- freq
 template$modulation$frequencyCyan <- freq
 
-template$modulation$contrastRed <- 97.2598068
-template$modulation$shiftRed <- 0
-template$modulation$contrastGreen <- 100
-template$modulation$shiftGreen <- 1
-template$modulation$contrastBlue <- 7.7765011
-template$modulation$shiftBlue <- 0
-template$modulation$contrastCyan <- 0.3540506
-template$modulation$shiftCyan <- 1
-
 ```
 
 ```{r}
@@ -259,7 +250,7 @@ for (i in 1:nrow(locations)) {
   template$id <- sprintf("ffff-%d-%d", 
                                  locations[i, "xpx"], 
                                  locations[i, "ypx"])
-  template$description <- sprintf("Max. L contrast: 11.7510; Location: %d %d", 
+  template$description <- sprintf("Max. L contrast: 25.1; Location: %d %d", 
                                  locations[i, "xdeg"], 
                                  locations[i, "ydeg"])
   
@@ -268,8 +259,8 @@ for (i in 1:nrow(locations)) {
   
   template$strategy$strName <- locations[i, "strategy"]
   
-  write_json(template, 
-             here("data", "presets", paste0(template$presetName, ".json")), 
+  write_json(template,
+             here("data", "presets", paste0(template$presetName, ".json")),
              auto_unbox = TRUE)
 }
 
